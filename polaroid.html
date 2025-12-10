@@ -9,6 +9,7 @@ body {
     margin: 0;
     background: #ffdde6;
     overflow: hidden;
+    font-family: sans-serif;
 }
 
 /* Background hearts */
@@ -22,7 +23,7 @@ body {
     animation: lovebg 25s linear infinite;
 }
 
-/* Polaroid effect with entrance */
+/* Polaroid effect */
 .polaroid {
     width: 150px;
     padding: 10px;
@@ -30,11 +31,11 @@ body {
     box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
     position: absolute;
     border-radius: 10px;
-    opacity: 0; /* mula invisible */
+    opacity: 0;
     animation: float 5s ease-in-out infinite, polaroidEntry 1s ease forwards;
 }
 
-/* Floating animation for polaroid */
+/* Floating animation */
 @keyframes float {
     0% { transform: translateY(0px) rotate(-3deg); }
     50% { transform: translateY(-30px) rotate(3deg); }
@@ -63,90 +64,105 @@ body {
     50% { opacity: 1; }
     100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
 }
+
+/* Overlay untuk play button */
+#overlay {
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    height:100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    z-index: 1000;
+    text-align: center;
+}
+
+#overlay button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background-color: #ff6699;
+    color: white;
+    cursor: pointer;
+}
 </style>
 </head>
-
 <body>
 
-<!-- Audio tanpa button -->
-<audio id="music" autoplay loop muted>
-  <source src="iloveyouthemost.mp3" type="audio/mpeg">
-</audio>
+<!-- Audio -->
+<audio id="music" src="iloveyouthemost.mp3" loop></audio>
+
+<!-- Overlay play button -->
+<div id="overlay">
+    <h2>❤️ Click Song ❤️</h2>
+    <button onclick="playMusic()">Main Lagu</button>
+</div>
 
 <script>
-// Senarai gambar polaroid
+// Polaroid images
 const images = [
-  "gambar1.jpg",
-  "gambar6.jpg",
-  "gambar3.jpg",
-  "gambar4.jpg",
-  "gambar5.jpg",
-  "gambar7.jpg",
-  "gambar8.jpg",
-  "gambar9.jpg",
-  "gambar10.jpg",
+  "gambar1.jpg", "gambar6.jpg", "gambar3.jpg",
+  "gambar4.jpg", "gambar5.jpg", "gambar7.jpg",
+  "gambar8.jpg", "gambar9.jpg", "gambar10.jpg",
   "gambar11.jpg"
-  
 ];
 
 const positions = [];
 
-// Fungsi cek jarak minimum supaya tak bertindih
-function isFarEnough(x, y, minDistance = 160) {
-    for (const pos of positions) {
+function isFarEnough(x, y, minDistance=160){
+    for(const pos of positions){
         const dx = pos.x - x;
         const dy = pos.y - y;
-        if (Math.sqrt(dx*dx + dy*dy) < minDistance) return false;
+        if(Math.sqrt(dx*dx + dy*dy) < minDistance) return false;
     }
     return true;
 }
 
-// Generate polaroid images tanpa bertindih
-for (let i = 0; i < 22; i++) {
-    let x, y;
-    let attempts = 0;
+// Generate polaroid images
+for(let i=0;i<30;i++){
+    let x, y, attempts=0;
     do {
-        x = Math.random()*70; // vw
-        y = Math.random()*70; // vh
+        x = Math.random()*70;
+        y = Math.random()*70;
         attempts++;
-        if (attempts > 50) break; // kalau susah nak cari spot
-    } while (!isFarEnough(x, y));
-
-    positions.push({x, y});
+        if(attempts>50) break;
+    } while(!isFarEnough(x,y));
+    positions.push({x,y});
 
     const img = document.createElement("img");
     img.src = images[i % images.length];
     img.className = "polaroid";
-
     img.style.top = y + "vh";
     img.style.left = x + "vw";
     img.style.transform = `rotate(${(Math.random()*20)-10}deg)`;
-    img.style.animationDelay = (i * 0.3) + "s"; // staggered
-
+    img.style.animationDelay = (i*0.3) + "s";
     document.body.appendChild(img);
 }
 
-// Generate floating "I love you" texts
-for (let i = 0; i < 30; i++) {
+// Floating "I love you" texts
+for(let i=0;i<30;i++){
     const text = document.createElement("div");
     text.className = "loveText";
     text.innerText = "I love you 💖";
-
-    text.style.left = Math.random() * 90 + "vw";
+    text.style.left = Math.random()*90 + "vw";
     text.style.fontSize = 12 + Math.random()*24 + "px";
-    text.style.animationDuration = (5 + Math.random()*5) + "s";
-
+    text.style.animationDuration = (5+Math.random()*5) + "s";
     document.body.appendChild(text);
 }
 
-// Cuba unmute selepas 1s
-const music = document.getElementById("music");
-setTimeout(() => {
-    music.muted = false;
-    music.play().catch(() => {
-        console.log("Autoplay diblock oleh browser. Audio mungkin tak keluar.");
-    });
-}, 1000);
+// Function play music
+function playMusic(){
+    const audio = document.getElementById("music");
+    audio.play();
+    document.getElementById("overlay").style.display = "none";
+}
 </script>
 
 </body>
